@@ -82,13 +82,30 @@ class CollisionEngine:
         return (dist_x**2 + dist_y**2) <= (ball.radius ** 2)
     
     def resolve_ball_block_collision(self, ball, block):
-        # Simple approach: reverse velocity based on penetration axis
 
-        overlap_x = ball.position.x - block.position.x
-        overlap_y = ball.position.y - block.position.y
+        # Step 1: Find closest point on rectangle
+        closest_x = max(block.position.x - block.width / 2,
+                        min(ball.position.x, block.position.x + block.width / 2))
 
-        # Decide collision axis (dominant direction)
-        if abs(overlap_x) > abs(overlap_y):
-            ball.velocity.x *= -1
-        else:
-            ball.velocity.y *= -1
+        closest_y = max(block.position.y - block.height / 2,
+                        min(ball.position.y, block.position.y + block.height / 2))
+
+        closest_point = Vector(closest_x, closest_y)
+
+        # Step 2: Collision normal
+        normal = (ball.position - closest_point)
+
+        if normal.magnitude() == 0:
+            return
+
+        normal = normal.normalize()
+
+        # Step 3: Reflect velocity
+        v = ball.velocity
+        ball.velocity = v - normal * (2 * v.dot(normal))
+
+        # Step 4: Fix penetration (push ball out)
+        overlap = ball.radius - ball.position.distance_to(closest_point)
+
+        if overlap > 0:
+            ball.position = ball.position + normal * overlap

@@ -5,30 +5,30 @@ from utils.vector import Vector
 from ui.simulator_ui import SimulatorUI
 
 # ------------------------
-# CREATE PHYSICS ENGINE
+# CREATE ENGINE
 # ------------------------
 engine = PhysicsEngine()
 
 # ------------------------
-# ADD OBJECTS
+# BALL (moving toward block diagonally)
 # ------------------------
-
-# Moving ball
 ball = Ball(
-    position=Vector(-80, 0),
-    velocity = Vector(20, 10),
+    position=Vector(-80, -40),
+    velocity=Vector(30, 17.25),
     mass=1,
     radius=10,
-    friction=0.05
+    friction=0.02
 )
 
-# Static block
+# ------------------------
+# BLOCK (static obstacle)
+# ------------------------
 block = Block(
-    position=Vector(60, 0),
+    position=Vector(40, 0),
     velocity=Vector(0, 0),
     mass=10,
-    width=40,
-    height=40,
+    width=60,
+    height=60,
     friction=0
 )
 
@@ -41,6 +41,6 @@ engine.add_object(block)
 engine.start()
 
 # ------------------------
-# START UI (this runs the loop)
+# RUN UI (real-time visualization)
 # ------------------------
 SimulatorUI(engine)

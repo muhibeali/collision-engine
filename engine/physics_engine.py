@@ -6,6 +6,12 @@ class PhysicsEngine:
         self.objects = []
         self.running = False
         self.collision_engine = CollisionEngine()
+        self.bounds = {
+        "left": -100,
+        "right": 100,
+        "top": 100,
+        "bottom": -100
+        }
 
     def add_object(self, obj):
         self.objects.append(obj)
@@ -31,6 +37,11 @@ class PhysicsEngine:
     # Step 2: handle collisions
         self.collision_engine.handle_collisions(self.objects)
 
+        for obj in self.objects:
+            self.apply_friction(obj, dt)
+            obj.update(dt)
+            self.handle_boundaries(obj)
+
     def apply_friction(self, obj, dt):
         # If object has no friction attribute, skip
         if not hasattr(obj, "friction"):
@@ -42,3 +53,24 @@ class PhysicsEngine:
         # Stop very small velocities (prevents infinite sliding)
         if obj.velocity.magnitude() < 0.01:
             obj.velocity = Vector(0, 0)
+    
+    def handle_boundaries(self, obj):
+        # Left wall
+        if obj.position.x - obj.radius < self.bounds["left"]:
+            obj.position.x = self.bounds["left"] + obj.radius
+            obj.velocity.x *= -1
+
+        # Right wall
+        if obj.position.x + obj.radius > self.bounds["right"]:
+            obj.position.x = self.bounds["right"] - obj.radius
+            obj.velocity.x *= -1
+
+    # Bottom wall
+        if obj.position.y - obj.radius < self.bounds["bottom"]:
+            obj.position.y = self.bounds["bottom"] + obj.radius
+            obj.velocity.y *= -1
+
+    # Top wall
+        if obj.position.y + obj.radius > self.bounds["top"]:
+            obj.position.y = self.bounds["top"] - obj.radius
+            obj.velocity.y *= -1

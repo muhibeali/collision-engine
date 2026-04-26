@@ -1,9 +1,11 @@
 from utils.vector import Vector
+from engine.collision_engine import CollisionEngine
 
 class PhysicsEngine:
     def __init__(self):
         self.objects = []
         self.running = False
+        self.collision_engine = CollisionEngine()
 
     def add_object(self, obj):
         self.objects.append(obj)
@@ -21,9 +23,13 @@ class PhysicsEngine:
         if not self.running:
             return
 
+        # Step 1: apply physics
         for obj in self.objects:
             self.apply_friction(obj, dt)
             obj.update(dt)
+
+    # Step 2: handle collisions
+        self.collision_engine.handle_collisions(self.objects)
 
     def apply_friction(self, obj, dt):
         # If object has no friction attribute, skip

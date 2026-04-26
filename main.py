@@ -1,20 +1,46 @@
 from engine.physics_engine import PhysicsEngine
 from objects.ball import Ball
+from objects.block import Block
 from utils.vector import Vector
+from ui.simulator_ui import SimulatorUI
 
+# ------------------------
+# CREATE PHYSICS ENGINE
+# ------------------------
 engine = PhysicsEngine()
 
-ball1 = Ball(Vector(0, 0), Vector(10, 0), mass=1, radius=5, friction=0)
-ball2 = Ball(Vector(15, 0), Vector(-5, 0), mass=1, radius=5, friction=0)
+# ------------------------
+# ADD OBJECTS
+# ------------------------
 
-engine.add_object(ball1)
-engine.add_object(ball2)
+# Moving ball
+ball = Ball(
+    position=Vector(-80, 0),
+    velocity = Vector(20, 10),
+    mass=1,
+    radius=10,
+    friction=0.05
+)
+
+# Static block
+block = Block(
+    position=Vector(60, 0),
+    velocity=Vector(0, 0),
+    mass=10,
+    width=40,
+    height=40,
+    friction=0
+)
+
+engine.add_object(ball)
+engine.add_object(block)
+
+# ------------------------
+# START SIMULATION
+# ------------------------
 engine.start()
 
-for i in range(10):
-    engine.update(0.1)
-
-    print(f"Step {i}")
-    print("Ball1:", ball1.position, ball1.velocity)
-    print("Ball2:", ball2.position, ball2.velocity)
-    print("-----")
+# ------------------------
+# START UI (this runs the loop)
+# ------------------------
+SimulatorUI(engine)

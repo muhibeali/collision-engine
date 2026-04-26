@@ -1,5 +1,7 @@
 from utils.vector import Vector
 from engine.collision_engine import CollisionEngine
+from objects.ball import Ball
+from objects.block import Block
 
 class PhysicsEngine:
     def __init__(self):
@@ -55,22 +57,52 @@ class PhysicsEngine:
             obj.velocity = Vector(0, 0)
     
     def handle_boundaries(self, obj):
-        # Left wall
-        if obj.position.x - obj.radius < self.bounds["left"]:
-            obj.position.x = self.bounds["left"] + obj.radius
-            obj.velocity.x *= -1
 
-        # Right wall
-        if obj.position.x + obj.radius > self.bounds["right"]:
-            obj.position.x = self.bounds["right"] - obj.radius
-            obj.velocity.x *= -1
+        # -----------------------
+        # BALL: STOP AT EDGES
+        # -----------------------
+        if isinstance(obj, Ball):
 
-    # Bottom wall
-        if obj.position.y - obj.radius < self.bounds["bottom"]:
-            obj.position.y = self.bounds["bottom"] + obj.radius
-            obj.velocity.y *= -1
+            # Left wall
+            if obj.position.x - obj.radius < self.bounds["left"]:
+                obj.position.x = self.bounds["left"] + obj.radius
+                obj.velocity.x = 0
 
-    # Top wall
-        if obj.position.y + obj.radius > self.bounds["top"]:
-            obj.position.y = self.bounds["top"] - obj.radius
-            obj.velocity.y *= -1
+            # Right wall
+            if obj.position.x + obj.radius > self.bounds["right"]:
+                obj.position.x = self.bounds["right"] - obj.radius
+                obj.velocity.x = 0
+
+            # Bottom wall
+            if obj.position.y - obj.radius < self.bounds["bottom"]:
+                obj.position.y = self.bounds["bottom"] + obj.radius
+                obj.velocity.y = 0
+
+            # Top wall
+            if obj.position.y + obj.radius > self.bounds["top"]:
+                obj.position.y = self.bounds["top"] - obj.radius
+                obj.velocity.y = 0
+
+        # -----------------------
+        # BLOCK: STOP AT EDGES
+        # -----------------------
+        elif isinstance(obj, Block):
+
+            half_w = obj.width / 2
+            half_h = obj.height / 2
+
+            if obj.position.x - half_w < self.bounds["left"]:
+                obj.position.x = self.bounds["left"] + half_w
+                obj.velocity.x = 0
+
+            if obj.position.x + half_w > self.bounds["right"]:
+                obj.position.x = self.bounds["right"] - half_w
+                obj.velocity.x = 0
+
+            if obj.position.y - half_h < self.bounds["bottom"]:
+                obj.position.y = self.bounds["bottom"] + half_h
+                obj.velocity.y = 0
+
+            if obj.position.y + half_h > self.bounds["top"]:
+                obj.position.y = self.bounds["top"] - half_h
+                obj.velocity.y = 0

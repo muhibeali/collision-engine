@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, colorchooser
+from tkinter import ttk, colorchooser, messagebox
 
 class SimulatorUI:
     def __init__(self, engine):
@@ -25,6 +25,8 @@ class SimulatorUI:
         self.create_layout()
         self.create_status_bar()
 
+        self.objects = []
+        self.game_loop()
         self.root.mainloop()
 
     # ---------------- MENU ---------------- #
@@ -113,7 +115,8 @@ class SimulatorUI:
         e = tk.Entry(parent)
         e.insert(0, default)
         e.pack()
-        setattr(self, label.replace(" ", "_").lower(), e)
+        key = label.lower().replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+        setattr(self, key, e)
 
     # ---------------- CONTROLS ---------------- #
     def create_control_buttons(self, parent):
@@ -164,7 +167,114 @@ class SimulatorUI:
 
     # ---------------- ACTIONS (PLACEHOLDER) ---------------- #
     def add_object(self):
-        print("Add Object Clicked")
+
+        from utils.vector import Vector
+        import math
+
+        try:
+            obj_type = self.type_var.get()
+
+            x = float(self.position_x.get())
+            y = float(self.position_y.get())
+
+            magnitude = float(self.velocity_magnitude.get())
+            angle = float(self.angle_deg.get())
+
+            mass = float(self.mass.get())
+            size = float(self.size_r___w.get())
+            friction = float(self.friction.get())
+
+            # Convert angle → radians
+            angle_rad = math.radians(angle)
+
+            vx = magnitude * math.cos(angle_rad)
+            vy = magnitude * math.sin(angle_rad)
+
+            velocity = Vector(vx, vy)
+            position = Vector(x, y)
+
+            if obj_type == "Ball":
+                from objects.ball import Ball
+
+                obj = Ball(
+                    position=position,
+                    velocity=velocity,
+                    mass=mass,
+                    radius=size,
+                    friction=friction
+                )
+
+            else:
+                from objects.block import Block
+
+                obj = Block(
+                    position=position,
+                    velocity=velocity,
+                    mass=mass,
+                    width=size,
+                    height=size,
+                    friction=friction
+                )
+
+            # Add to engine
+            self.engine.add_object(obj)
+
+            # Draw object
+            self.draw_object(obj)
+
+            self.status.config(text=f"Added {obj_type}")
+
+        except Exception as e:
+            self.status.config(text=f"Error: {str(e)}")
+
+    def draw_object(self, obj):
+
+        scale = 1  # you can change later
+
+        x = obj.position.x + 350
+        y = 300 - obj.position.y
+
+        color = self.selected_color
+
+        if hasattr(obj, "radius"):  # Ball
+            r = obj.radius
+
+            self.canvas.create_oval(
+                x - r, y - r,
+                x + r, y + r,
+                fill=color,
+                outline="",
+                tags="object"
+            )
+
+        else:  # Block
+            w = obj.width / 2
+            h = obj.height / 2
+
+            self.canvas.create_rectangle(
+                x - w, y - h,
+                x + w, y + h,
+                fill=color,
+                outline="",
+                tags="object"
+            )
+
+    def game_loop(self):
+
+        dt = 0.016 * self.speed.get()  # ~60 FPS scaled
+
+        self.engine.update(dt)
+
+        self.redraw()
+
+        self.root.after(16, self.game_loop)
+    
+    def redraw(self):
+
+        self.canvas.delete("object")
+
+        for obj in self.engine.objects:
+            self.draw_object(obj)
 
     def start_sim(self):
         self.status.config(text="Status: Running")
@@ -185,7 +295,7 @@ class SimulatorUI:
         print("Load Scenario")
 
     def show_about(self):
-        tk.messagebox.showinfo("About", "Collision Simulation Engine\nCS112 Project")
+        messagebox.showinfo("About", "Collision Simulation Engine\nCS112 Project")
 
     def pick_color(self):
         color = colorchooser.askcolor()[1]

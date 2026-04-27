@@ -4,6 +4,7 @@ from tkinter import ttk, colorchooser, messagebox
 class SimulatorUI:
     def __init__(self, engine):
         self.engine = engine
+        self.running = False 
 
         self.root = tk.Tk()
         self.root.title("Collision Simulation Engine")
@@ -25,7 +26,6 @@ class SimulatorUI:
         self.create_layout()
         self.create_status_bar()
 
-        self.objects = []
         self.game_loop()
         self.root.mainloop()
 
@@ -165,7 +165,7 @@ class SimulatorUI:
         )
         self.status.pack(fill="x")
 
-    # ---------------- ACTIONS (PLACEHOLDER) ---------------- #
+    # ---------------- ACTIONS ---------------- #
     def add_object(self):
 
         from utils.vector import Vector
@@ -219,9 +219,6 @@ class SimulatorUI:
             # Add to engine
             self.engine.add_object(obj)
 
-            # Draw object
-            self.draw_object(obj)
-
             self.status.config(text=f"Added {obj_type}")
 
         except Exception as e:
@@ -261,9 +258,11 @@ class SimulatorUI:
 
     def game_loop(self):
 
-        dt = 0.016 * self.speed.get()  # ~60 FPS scaled
+        dt = 0.016 * self.speed.get()
 
-        self.engine.update(dt)
+        # ONLY update physics if running
+        if self.running:
+            self.engine.update(dt)
 
         self.redraw()
 
@@ -277,16 +276,17 @@ class SimulatorUI:
             self.draw_object(obj)
 
     def start_sim(self):
+        self.running = True
         self.status.config(text="Status: Running")
-        print("Simulation Started")
 
     def pause_sim(self):
+        self.running = False
         self.status.config(text="Status: Paused")
-        print("Simulation Paused")
 
     def reset_sim(self):
+        self.running = False
+        self.engine.reset()
         self.status.config(text="Status: Reset")
-        print("Simulation Reset")
 
     def save_scenario(self):
         print("Save Scenario")

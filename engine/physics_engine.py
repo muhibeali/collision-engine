@@ -31,17 +31,13 @@ class PhysicsEngine:
         if not self.running:
             return
 
-        # Step 1: apply physics
         for obj in self.objects:
             self.apply_friction(obj, dt)
             obj.update(dt)
 
-    # Step 2: handle collisions
         self.collision_engine.handle_collisions(self.objects)
 
         for obj in self.objects:
-            self.apply_friction(obj, dt)
-            obj.update(dt)
             self.handle_boundaries(obj)
 
     def apply_friction(self, obj, dt):

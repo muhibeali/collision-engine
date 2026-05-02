@@ -1,40 +1,38 @@
 import math
 
+
 class Vector:
-    def __init__(self, x=0.0, y=0.0):
+    def __init__(self, x: float = 0.0, y: float = 0.0):
         self.x = float(x)
         self.y = float(y)
 
-    # Vector addition
-    def __add__(self, other):
+    def __add__(self, other: "Vector") -> "Vector":
         return Vector(self.x + other.x, self.y + other.y)
 
-    # Vector subtraction
-    def __sub__(self, other):
+    def __sub__(self, other: "Vector") -> "Vector":
         return Vector(self.x - other.x, self.y - other.y)
 
-    # Scalar multiplication
-    def __mul__(self, scalar):
+    def __mul__(self, scalar: float) -> "Vector":
         return Vector(self.x * scalar, self.y * scalar)
 
-    # Magnitude
-    def magnitude(self):
-        return math.sqrt(self.x**2 + self.y**2)
+    def __truediv__(self, scalar: float) -> "Vector":
+        return Vector(self.x / scalar, self.y / scalar)
 
-    # Normalize
-    def normalize(self):
+    def __neg__(self) -> "Vector":
+        return Vector(-self.x, -self.y)
+
+    def __repr__(self) -> str:
+        return f"Vector({self.x:.2f}, {self.y:.2f})"
+
+    def magnitude(self) -> float:
+        return math.sqrt(self.x ** 2 + self.y ** 2)
+
+    def normalize(self) -> "Vector":
         mag = self.magnitude()
-        if mag == 0:
-            return Vector(0, 0)
-        return Vector(self.x / mag, self.y / mag)
+        return Vector(self.x / mag, self.y / mag) if mag != 0 else Vector(0, 0)
 
-    # Dot product
-    def dot(self, other):
+    def dot(self, other: "Vector") -> float:
         return self.x * other.x + self.y * other.y
 
-    # Distance
-    def distance_to(self, other):
+    def distance_to(self, other: "Vector") -> float:
         return (self - other).magnitude()
-
-    def __repr__(self):
-        return f"Vector({self.x:.2f}, {self.y:.2f})"

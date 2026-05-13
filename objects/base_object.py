@@ -13,7 +13,7 @@ class BaseObject(ABC):
     @property
     @abstractmethod
     def half_extents(self) -> tuple:
-        """Returns (half_width, half_height) for boundary and collision checks."""
+        #Returns (half_width, half_height) for boundary and collision checks.
         pass
 
     @abstractmethod
